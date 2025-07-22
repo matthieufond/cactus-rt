@@ -59,6 +59,28 @@ if(CACTUS_RT_ENABLE_FETCH_DEPENDENCIES)
   FetchContent_MakeAvailable(readerwriterqueue)
   get_target_property(READERWRITERQUEUE_INC readerwriterqueue INTERFACE_INCLUDE_DIRECTORIES)
   set_target_properties(readerwriterqueue PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES "${READERWRITERQUEUE_INC}")
+else()
+  # Use external dependencies provided by parent project
+  if(NOT TARGET quill::quill)
+    find_package(quill REQUIRED)
+  endif()
+  
+  # Create alias for consistency with FetchContent version
+  if(NOT TARGET quill)
+    add_library(quill ALIAS quill::quill)
+  endif()
+  
+  # Find readerwriterqueue (header-only)
+  find_path(READERWRITERQUEUE_INCLUDE_DIR 
+    NAMES readerwriterqueue.h
+    PATH_SUFFIXES readerwriterqueue
+  )
+  if(READERWRITERQUEUE_INCLUDE_DIR)
+    add_library(readerwriterqueue INTERFACE)
+    target_include_directories(readerwriterqueue INTERFACE ${READERWRITERQUEUE_INCLUDE_DIR})
+  else()
+    message(FATAL_ERROR "readerwriterqueue not found. Please install it or set CMAKE_PREFIX_PATH")
+  endif()
 endif()
 
 ##########################################################
@@ -128,7 +150,8 @@ add_library(cactus_rt
 
 target_include_directories(cactus_rt
   PUBLIC
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
 )
 
 target_link_libraries(cactus_rt

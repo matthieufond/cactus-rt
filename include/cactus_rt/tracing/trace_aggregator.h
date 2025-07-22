@@ -4,7 +4,8 @@
 #ifndef CACTUS_RT_TRACING_ENABLED
 #include "trace_aggregator.disabled.h"
 #else
-#include <quill/Quill.h>
+#include <quill/Frontend.h>
+#include <quill/Backend.h>
 
 #include <atomic>
 #include <list>

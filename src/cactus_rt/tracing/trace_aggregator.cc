@@ -6,6 +6,8 @@
 #include <memory>
 #include <mutex>
 
+#include "quill/LogMacros.h"
+
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
 #endif
@@ -57,7 +59,7 @@ namespace cactus_rt::tracing {
 TraceAggregator::TraceAggregator(std::string process_name)
     : process_name_(process_name),
       process_track_uuid_(static_cast<uint64_t>(getpid())),
-      logger_(quill::create_logger("__trace_aggregator__")) {
+      logger_(nullptr) {
 }
 
 void TraceAggregator::RegisterThreadTracer(std::shared_ptr<ThreadTracer> tracer) {
@@ -130,6 +132,9 @@ void TraceAggregator::Stop() noexcept {
 }
 
 quill::Logger* TraceAggregator::Logger() noexcept {
+  if (!logger_) {
+    logger_ = quill::Frontend::create_or_get_logger("__trace_aggregator__");
+  }
   return logger_;
 }
 

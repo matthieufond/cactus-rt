@@ -9,7 +9,9 @@
 #include <string>
 
 #include "config.h"
-#include "quill/Quill.h"
+#include "quill/Backend.h"
+#include "quill/Frontend.h"
+#include <quill/sinks/ConsoleSink.h>
 #include "tracing/thread_tracer.h"
 #include "tracing/trace_aggregator.h"
 
@@ -30,7 +32,7 @@ class Thread {
   std::vector<size_t> cpu_affinity_;
   size_t              stack_size_;
 
-  quill::Logger*                         logger_;
+  mutable quill::Logger*                 logger_;
   std::shared_ptr<tracing::ThreadTracer> tracer_ = nullptr;
 
   std::atomic_bool stop_requested_ = false;
@@ -55,12 +57,12 @@ class Thread {
    * @param name The thread name
    * @param config The configuration for the thread
    */
-  Thread(std::string name, ThreadConfig config)
+  Thread(std::string name, const ThreadConfig& config)
       : config_(config),
         name_(name),
         cpu_affinity_(config_.cpu_affinity),
         stack_size_(static_cast<size_t>(PTHREAD_STACK_MIN) + config_.stack_size),
-        logger_(quill::create_logger(name_)) {
+        logger_(nullptr) {
     if (!config.scheduler) {
       throw std::runtime_error("ThreadConfig::scheduler cannot be nullptr");
     }
@@ -118,7 +120,12 @@ class Thread {
   void Start(int64_t start_monotonic_time_ns);
 
  protected:
-  inline quill::Logger* Logger() const { return logger_; }
+  virtual quill::Logger* Logger() const {
+    if (!logger_) {
+      logger_ = quill::Frontend::create_or_get_logger(name_, quill::Frontend::create_or_get_sink<quill::ConsoleSink>(name_));
+    }
+    return logger_;
+  }
 
   /**
    * Gets the current tracer object. Should only ever be called from within the thread itself.

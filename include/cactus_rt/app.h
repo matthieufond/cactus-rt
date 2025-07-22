@@ -8,7 +8,8 @@
 #include <vector>
 
 #include "config.h"
-#include "quill/Quill.h"
+#include "quill/Frontend.h"
+#include "quill/Backend.h"
 #include "thread.h"
 #include "tracing/thread_tracer.h"
 #include "tracing/trace_aggregator.h"
@@ -29,7 +30,7 @@ class App {
   size_t heap_size_;
 
   // Configuration for quill logging
-  quill::Config logger_config_;
+  quill::BackendOptions logger_config_;
 
   TracerConfig tracer_config_;
 
@@ -37,16 +38,9 @@ class App {
 
   std::vector<std::shared_ptr<Thread>> threads_;
 
-  void SetDefaultLogFormat(quill::Config& cfg) {
-    // Create a handler of stdout
-    const std::shared_ptr<quill::Handler> handler = quill::stdout_handler();
-
-    // Enable console colours on the handler
-    static_cast<quill::ConsoleHandler*>(handler.get())->enable_console_colours();
-
-    // Set the default pattern
-    handler->set_pattern("[%(ascii_time)][%(level_id)][%(logger_name)][%(filename):%(lineno)] %(message)", "%Y-%m-%d %H:%M:%S.%Qns");
-    cfg.default_handlers.push_back(handler);
+  void SetDefaultLogFormat(quill::BackendOptions& cfg) {
+    // Note: quill v10+ uses different API - keeping this method for compatibility but not configuring handlers
+    // Users should configure handlers using quill::Frontend::create_or_get_handler() after quill::Backend::start()
   }
 
  public:

@@ -9,7 +9,8 @@
 #include <type_traits>
 
 #include "../experimental/lockless/spsc/realtime_readable_value.h"
-#include "quill/Quill.h"
+#include "quill/Frontend.h"
+#include "quill/Backend.h"
 
 // Note: ROS subscription dispatch is here: https://github.com/ros2/rclcpp/blob/e10728c/rclcpp/include/rclcpp/any_subscription_callback.hpp#L481
 // We are using the TypeAdapter method.

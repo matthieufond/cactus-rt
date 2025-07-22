@@ -7,7 +7,8 @@
 #include <rclcpp/rclcpp.hpp>
 #include <type_traits>
 
-#include "quill/Quill.h"
+#include "quill/Frontend.h"
+#include "quill/Backend.h"
 
 namespace cactus_rt::ros2 {
 class Ros2Adapter;

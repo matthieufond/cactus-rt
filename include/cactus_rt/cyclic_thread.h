@@ -21,8 +21,8 @@ class CyclicThread : public Thread {
    * @param name The thread name
    * @param config A cactus_rt::CyclicThreadConfig that specifies configuration parameters for this thread
    */
-  CyclicThread(std::string name, CyclicThreadConfig config) : Thread(name, config),
-                                                              period_ns_(config.period_ns) {
+  CyclicThread(std::string name, const CyclicThreadConfig &config) : Thread(name, config),
+                                                                     period_ns_(config.period_ns) {
   }
 
   void Run() noexcept final;

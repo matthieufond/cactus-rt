@@ -11,7 +11,8 @@
 #include <vector>
 
 #include "publisher.h"
-#include "quill/Quill.h"
+#include "quill/Frontend.h"
+#include "quill/Backend.h"
 #include "subscription.h"
 
 namespace cactus_rt::ros2 {
