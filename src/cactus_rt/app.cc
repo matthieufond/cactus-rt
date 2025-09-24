@@ -115,15 +115,15 @@ void App::LockMemory() const {
   //             of the process in the future. These could be, for instance,
   //             new pages required by a growing heap and stack as well as new
   //             memory mapped files and shared memory regions.
-  int ret = mlockall(MCL_CURRENT | MCL_FUTURE);
+  /* int ret = mlockall(MCL_CURRENT | MCL_FUTURE);
   if (ret != 0) {
     throw std::runtime_error{std::string("mlockall failed: ") + std::strerror(errno)};
-  }
+  }*/
 
   // Do not free any RAM to the OS if the contiguous free memory at the top of
   // the heap grows too large. If RAM is freed, a syscall (sbrk) will be called
   // which can have unbounded execution time.
-  ret = mallopt(M_TRIM_THRESHOLD, -1);
+  int ret = mallopt(M_TRIM_THRESHOLD, -1);
   if (ret == 0) {
     // on error, errno is not set by mallopt
     throw std::runtime_error{"mallopt M_TRIM_THRESHOLD failed"};
